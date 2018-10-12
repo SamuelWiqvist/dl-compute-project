@@ -14,7 +14,14 @@ import StatsBase.predict
 # load help function
 include(pwd()*"/utilities.jl")
 
+Random.seed!(1234) # set random numbers
+
+
 x_train,y_train,x_val,y_val,x_test,y_test = load_data()
+
+y_train = y_train .+ 1
+y_val = y_val .+ 1
+y_test = y_test .+ 1
 
 # define network
 n_input = 8
@@ -28,6 +35,11 @@ w = Any[ xavier(n_hidden_1,n_input), zeros(n_hidden_1,1),
          xavier(n_hidden_3,n_hidden_2), zeros(n_hidden_3,1),
          xavier(n_out,n_hidden_3), zeros(n_out,1)]
 
+#=
+w = Any[ xavier(n_hidden_1,n_input), zeros(n_hidden_1,1),
+         xavier(n_out,n_hidden_1), zeros(n_out,1)]
+=#
+
 nbr_training_obs = length(y_train)
 nbr_parameters = 0
 
@@ -40,57 +52,83 @@ end
 
 # predict function
 function predict(w,x)
+    output = zeros(2,size(x,2))
     for i=1:2:length(w)-2
         x = relu.(w[i]*x .+ w[i+1])
     end
-    return sigm.(w[end-1]*x .+ w[end]) #sigm.(w[end-1]*x .+ w[end])
+    return w[end-1]*x .+ w[end]
 end
 
-loss(w,x,ygold) = Knet.nll(predict(w,x), ygold)
+loss(w,x,ygold) = Knet.nll(predict(w,x), ygold; average=false)
 
 lossgradient = grad(loss)
 
 optim = optimizers(w, Adam)
 
+function train(epoch::Int,dropout_percentage::Real,lambda::Vector)
 
-# train network
-epoch = 10000
-loss_train = zeros(epoch)
-loss_val = zeros(epoch)
+    loss_train = zeros(epoch)
+    loss_val = zeros(epoch)
 
-idx_train = ones(Int, size(x_train,2))
-idx_val = ones(Int, size(x_val,2))
-first_idx = findfirst(y_val .== 1)
-idx_train[1] = size(x_train,2)
-idx_val[1] = first_idx
+    idx_train = ones(Int, size(x_train,2))
+    idx_val = ones(Int, size(x_val,2))
+    first_idx = findfirst(y_val .== 1)
+    idx_train[1] = size(x_train,2)
+    idx_val[1] = first_idx
 
-@time for i in 1:epoch
+    for i in 1:epoch
 
-    ixd_rand = rand(1:size(x_train,2)-1,size(x_train,2)-1)
-    idx_train[2:end] = ixd_rand
+        ixd_rand = rand(1:size(x_train,2)-1,size(x_train,2)-1)
+        idx_train[2:end] = ixd_rand
 
-    ixd_rand = rand(setdiff(1:size(x_val,2),first_idx),size(x_val,2)-1)
-    idx_val[2:end] = ixd_rand
+        ixd_rand = rand(setdiff(1:size(x_val,2),first_idx),size(x_val,2)-1)
+        idx_val[2:end] = ixd_rand
 
-    grads = lossgradient(w,x_train[:,idx_train[:]],y_train[idx_train])
-    update!(w, grads, optim)
+        grads = lossgradient(w,x_train[:,idx_train[:]],y_train[idx_train])
+        update!(w, grads, optim)
 
-    loss_train[i] = loss(w,x_train[:,idx_train[:]], y_train[idx_train])
-    loss_val[i] = loss(w,x_val[:,idx_val], y_val[idx_val])
+        loss_train[i] = loss(w,x_train[:,idx_train[:]], y_train[idx_train])
+        loss_val[i] = loss(w,x_val[:,idx_val], y_val[idx_val])
+
+    end
+
+    return loss_train, loss_val
 
 end
 
-# calc predicss
-y_pred_train = class(predict(w, x_train))
-y_pred = class(predict(w, x_test))
+
+# training
+@time loss_train, loss_val = train(5000,0,zeros(3))
+
+y_pred_train_proc = predict(w, x_train)
+y_pred_proc = predict(w, x_test)
+
+y_pred_train = zeros(length(y_train))
+y_pred_test = zeros(length(y_test))
+
+for i = 1:length(y_train)
+    if findmax(y_pred_train_proc[:,i])[2]  == 1
+        y_pred_train[i] = 1
+    else
+        y_pred_train[i] = 2
+    end
+end
+
+for i = 1:length(y_test)
+    if findmax(y_pred_proc[:,i])[2]  == 1
+        y_pred_test[i] = 1
+    else
+        y_pred_test[i] = 2
+    end
+end
 
 # loss
 loss_training = loss(w,x_train[:,end:-1:1], y_train[end:-1:1])
 loss_test = loss(w,x_test[:,end:-1:1], y_test[end:-1:1])
 
 # classification results
-class_res_training = classification_results(y_pred_train, y_train)
-class_res_test = classification_results(y_pred, y_test)
+class_res_training = classification_results(y_pred_train, y_train, [1,2])
+class_res_test = classification_results(y_pred_test, y_test, [1,2])
 
 # loss as function of epoch
 PyPlot.figure()

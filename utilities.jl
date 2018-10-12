@@ -55,13 +55,13 @@ function class(y)
 end
 
 
-function classification_results(y_hat, y)
+function classification_results(y_hat, y, classes)
 
-    idx_pos = findall(y .== 1)
-    idx_neg = findall(y .== 0)
+    idx_pos = findall(y .== classes[1])
+    idx_neg = findall(y .== classes[2])
 
-    TP = sum(y_hat[idx_pos] .== 1)
-    TN = sum(y_hat[idx_neg] .== 0)
+    TP = sum(y_hat[idx_pos] .== classes[1])
+    TN = sum(y_hat[idx_neg] .== classes[2])
 
     sens = TP/length(idx_pos)
     spec = TN/length(idx_neg)
