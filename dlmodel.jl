@@ -28,10 +28,6 @@ w = Any[ xavier(n_hidden_1,n_input), zeros(n_hidden_1,1),
          xavier(n_hidden_3,n_hidden_2), zeros(n_hidden_3,1),
          xavier(n_out,n_hidden_3), zeros(n_out,1)]
 
-w = Any[ xavier(n_hidden_1,n_input), zeros(n_hidden_1,1),
-         xavier(n_out,n_hidden_1), zeros(n_out,1)]*
-
-
 nbr_training_obs = length(y_train)
 nbr_parameters = 0
 
