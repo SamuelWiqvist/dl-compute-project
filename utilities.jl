@@ -53,3 +53,31 @@ function class(y)
     return class
 
 end
+
+
+function classification_results(y_hat, y)
+
+    idx_pos = findall(y .== 1)
+    idx_neg = findall(y .== 0)
+
+    TP = 0
+    for i in idx_pos
+        if y_hat[i] == 1
+            TP = TP + 1
+        end
+    end
+
+    TN = 0
+    for i in idx_neg
+        if y_hat[i] == 0
+            TN = TN + 1
+        end
+    end
+
+    sens = TP/length(idx_pos)
+    spec = TN/length(idx_neg)
+    acc = (TP+TN)/length(y)
+
+    return acc,sens,spec
+
+end

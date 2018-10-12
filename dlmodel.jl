@@ -14,8 +14,6 @@ import StatsBase.predict
 # load help function
 include(pwd()*"/utilities.jl")
 
-Random.seed!(1234) # set random numbers
-
 x_train,y_train,x_val,y_val,x_test,y_test = load_data()
 
 # define network
@@ -31,7 +29,7 @@ w = Any[ xavier(n_hidden_1,n_input), zeros(n_hidden_1,1),
          xavier(n_out,n_hidden_3), zeros(n_out,1)]
 
 w = Any[ xavier(n_hidden_1,n_input), zeros(n_hidden_1,1),
-         xavier(n_out,n_hidden_1), zeros(n_out,1)]
+         xavier(n_out,n_hidden_1), zeros(n_out,1)]*
 
 
 nbr_training_obs = length(y_train)
@@ -47,12 +45,10 @@ print(network_info)
 
 # predict function
 function predict(w,x)
-    #x = mat(x)
     for i=1:2:length(w)-2
         x = relu.(w[i]*x .+ w[i+1])
-        #x = map(relu, x)
     end
-    return sigm.(w[end-1]*x .+ w[end])
+    return sigm.(w[end-1]*x .+ w[end]) #sigm.(w[end-1]*x .+ w[end])
 end
 
 loss(w,x,ygold) = Knet.nll(predict(w,x), ygold)
@@ -63,22 +59,22 @@ optim = optimizers(w, Adam)
 
 
 # train network
-epoch = 1000
+epoch = 10000
 loss_train = zeros(epoch)
 loss_val = zeros(epoch)
 
 idx_train = ones(Int, size(x_train,2))
 idx_val = ones(Int, size(x_val,2))
+first_idx = findfirst(y_val .== 1)
+idx_train[1] = size(x_train,2)
+idx_val[1] = first_idx
 
 @time for i in 1:epoch
 
     ixd_rand = rand(1:size(x_train,2)-1,size(x_train,2)-1)
-    idx_train[1] = size(x_train,2)
     idx_train[2:end] = ixd_rand
 
-    first_idx = findfirst(y_val .== 1)
     ixd_rand = rand(setdiff(1:size(x_val,2),first_idx),size(x_val,2)-1)
-    idx_val[1] = first_idx
     idx_val[2:end] = ixd_rand
 
     grads = lossgradient(w,x_train[:,idx_train[:]],y_train[idx_train])
@@ -93,11 +89,17 @@ end
 y_pred_train = class(predict(w, x_train))
 y_pred = class(predict(w, x_test))
 
-# print accurracy for training and test data
-println(sum(y_pred_train .== y_train) / length(y_train))
-println(sum(y_pred .== y_test) / length(y_test))
+# loss
+loss_training = loss(w,x_train[:,end:-1:1], y_train[end:-1:1])
+loss_test = loss(w,x_test[:,end:-1:1], y_test[end:-1:1])
+
+# classification results
+class_res_training = classification_results(y_pred_train, y_train)
+class_res_test = classification_results(y_pred, y_test)
 
 # loss as function of epoch
 PyPlot.figure()
 PyPlot.plot(loss_train, "b")
+
+PyPlot.figure()
 PyPlot.plot(loss_val, "r")
