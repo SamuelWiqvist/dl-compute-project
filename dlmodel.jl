@@ -36,8 +36,7 @@ for i in w
     global nbr_parameters = nbr_parameters + size(i,1)*size(i,2)
 end
 
-network_info = @sprintf "Nbr training obs %d, nbr parameters %d, obs/parameters %.2f\n" nbr_training_obs nbr_parameters nbr_training_obs/nbr_parameters
-print(network_info)
+@printf "Nbr training obs %d, nbr parameters %d, obs/parameters %.2f\n" nbr_training_obs nbr_parameters nbr_training_obs/nbr_parameters
 
 # predict function
 function predict(w,x)
