@@ -69,7 +69,7 @@ function class_nll(y,labels)
 
     class = zeros(Int, size(y,2))
 
-    for i = 1:length(y_train)
+    for i = 1:size(y,2)
         if findmax(y[:,i])[2]  == 1
             class[i] = labels[1]
         else

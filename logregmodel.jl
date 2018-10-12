@@ -12,6 +12,8 @@ using DataFrames
 # include files
 include(pwd()*"/utilities.jl")
 
+Random.seed!(1234) # set random numbers
+
 # load data
 x_train,y_train,x_val,y_val,x_test,y_test = load_data()
 
@@ -29,16 +31,10 @@ model = @formula(x9 ~ x1+x2+x3+x4+x5+x6+x7+x8)
 print(logisticregresson)
 
 # compute predictions
-y_pred_train = zeros(2,length(y_train))
-y_pred_train[1,:] = predict(logisticregresson)
-y_pred_train[2,:] = 1 .- y_pred_train[1,:]
-y_pred_train = class(y_pred_train)
+y_pred_train = class_logistic(predict(logisticregresson))
+y_pred_test = class_logistic(predict(logisticregresson,test_df))
 
-y_pred = zeros(2,length(y_test))
-y_pred[1,:] = predict(logisticregresson,test_df)
-y_pred[2,:] = 1 .- y_pred[1,:]
-y_pred = class(y_pred)
 
 # check classification results
-class_res_training = classification_results(y_pred_train, y_train)
-class_res_test = classification_results(y_pred, y_test)
+class_res_training = classification_results(y_pred_train, y_train, [0,1])
+class_res_test = classification_results(y_pred_test, y_test, [0,1])
