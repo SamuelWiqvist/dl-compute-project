@@ -20,20 +20,14 @@ x_train,y_train,x_val,y_val,x_test,y_test = load_data([1,2])
 
 # define network
 n_input = 8
-n_hidden_1 = 100
-n_hidden_2 = 50
-n_hidden_3 = 25
+n_hidden_1 = 80
+n_hidden_2 = 20
 n_out = 2
 
 w = Any[ xavier(n_hidden_1,n_input), zeros(n_hidden_1,1),
          xavier(n_hidden_2,n_hidden_1), zeros(n_hidden_2,1),
-         xavier(n_hidden_3,n_hidden_2), zeros(n_hidden_3,1),
-         xavier(n_out,n_hidden_3), zeros(n_out,1)]
+         xavier(n_out,n_hidden_2), zeros(n_out,1)]
 
-#=
-w = Any[ xavier(n_hidden_1,n_input), zeros(n_hidden_1,1),
-         xavier(n_out,n_hidden_1), zeros(n_out,1)]
-=#
 nbr_training_obs = length(y_train)
 nbr_parameters = 0
 
@@ -57,7 +51,7 @@ function predict(w,x,p)
     return w[end-1]*x .+ w[end]
 end
 
-loss(w,x,ygold,p, lambda) = Knet.nll(predict(w,x,p), ygold; average=false) + lambda[1]*sum(abs.(w[1]))  + lambda[2]*sum(abs.(w[3]))  + lambda[3]*sum(abs.(w[5]))  + lambda[4]*sum(abs.(w[7]))
+loss(w,x,ygold,p, lambda) = Knet.nll(predict(w,x,p), ygold; average=false) + lambda[1]*sum(abs.(w[1]))  + lambda[2]*sum(abs.(w[3]))  + lambda[3]*sum(abs.(w[5]))
 
 lossgradient = grad(loss)
 
@@ -87,23 +81,27 @@ end
 
 
 # training
-dropout_percentage = 0
-lambda = [0.001, 0.001, 0.001]
+dropout_percentage = 0.1
+lambda = [0.01, 0.01, 0.01]
 @time loss_train, loss_val = train(5000, dropout_percentage, lambda)
 
 # calc predictions
 y_pred_train_proc = predict(w, x_train, 0)
+y_pred_val_proc = predict(w, x_val, 0)
 y_pred_proc = predict(w, x_test, 0)
 
 y_pred_train = class_nll(y_pred_train_proc,[1,2])
+y_pred_val = class_nll(y_pred_val_proc,[1,2])
 y_pred_test = class_nll(y_pred_proc,[1,2])
 
 # loss
 loss_training = loss(w,x_train, y_train, 0, lambda)/length(y_train)
+loss_val = loss(w,x_val, y_val, 0, lambda)/length(y_val)
 loss_test = loss(w,x_test, y_test, 0, lambda)/length(y_test)
 
 # classification results
 class_res_training = classification_results(y_pred_train, y_train, [1,2])
+class_res_val = classification_results(y_pred_val, y_val, [1,2])
 class_res_test = classification_results(y_pred_test, y_test, [1,2])
 
 # loss as function of epoch
