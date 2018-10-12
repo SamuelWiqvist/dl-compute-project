@@ -17,11 +17,7 @@ include(pwd()*"/utilities.jl")
 Random.seed!(1234) # set random numbers
 
 
-x_train,y_train,x_val,y_val,x_test,y_test = load_data()
-
-y_train = y_train .+ 1
-y_val = y_val .+ 1
-y_test = y_test .+ 1
+x_train,y_train,x_val,y_val,x_test,y_test = load_data([1,2])
 
 # define network
 n_input = 8
@@ -121,6 +117,10 @@ for i = 1:length(y_test)
         y_pred_test[i] = 2
     end
 end
+
+y_pred_train = class_nll(y_pred_train_proc,labels)
+y_pred_test = class_nll(y_pred_proc,labels)
+
 
 # loss
 loss_training = loss(w,x_train[:,end:-1:1], y_train[end:-1:1])

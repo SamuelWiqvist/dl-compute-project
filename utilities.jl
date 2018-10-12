@@ -2,7 +2,7 @@ using CSV
 using Statistics
 using StatsBase
 
-function load_data(frac_val::Real = 0.1)
+function load_data(labels::Vector = [0,1], frac_val::Real = 0.1)
 
     # read training data
     d_train = Matrix(CSV.read(pwd()*"/ds4/pima-trn_edit.csv"; allowmissing=:auto,header=0 ))
@@ -36,17 +36,44 @@ function load_data(frac_val::Real = 0.1)
     x_test = Array(x_test')
     x_val = Array(x_val')
 
+    # set labels for classes
+    y_train[findall(y_train .== 1)] .= labels[2]
+    y_train[findall(y_train .== 0)] .= labels[1]
+
+    y_val[findall(y_val .== 1)] .= labels[2]
+    y_val[findall(y_val .== 0)] .= labels[1]
+
+    y_test[findall(y_test .== 1)] .= labels[2]
+    y_test[findall(y_test .== 0)] .= labels[1]
+
     return x_train,y_train,x_val,y_val,x_test,y_test
 end
 
 
-function class(y)
+function class_logistic(y)
+
+    class = zeros(Int, length(y))
+
+    for i in 1:length(y)
+        if y[i] > 0.5
+            class[i] = 1
+        end
+    end
+
+    return class
+
+end
+
+
+function class_nll(y,labels)
 
     class = zeros(Int, size(y,2))
 
-    for i in 1:size(y,2)
-        if y[1,i] > 0.5
-            class[i] = 1
+    for i = 1:length(y_train)
+        if findmax(y[:,i])[2]  == 1
+            class[i] = labels[1]
+        else
+            class[i] = labels[2]
         end
     end
 
