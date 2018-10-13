@@ -5,12 +5,12 @@ using StatsBase
 function load_data(labels::Vector = [0,1], frac_val::Real = 0.1)
 
     # read training data
-    d_train = Matrix(CSV.read(pwd()*"/ds4/pima-trn_edit.csv"; allowmissing=:auto,header=0 ))
+    d_train = Matrix(CSV.read(pwd()*"/ds4/pima-trn_edit.csv"; allowmissing=:auto,header=0))
     x_train = d_train[:,1:8]
     y_train = convert(Array{Int64,1},d_train[:,end])
 
     # read test data
-    d_test = Matrix(CSV.read(pwd()*"/ds4/pima-val_edit.csv"; allowmissing=:auto,header=0 ))
+    d_test = Matrix(CSV.read(pwd()*"/ds4/pima-val_edit.csv"; allowmissing=:auto,header=0))
     x_test = d_test[:,1:8]
     y_test = convert(Array{Int64,1},d_test[:,end])
 
@@ -94,6 +94,6 @@ function classification_results(y_hat, y, classes)
     spec = TN/length(idx_neg)
     acc = (TP+TN)/length(y)
 
-    return acc,sens,spec
+    return [acc,sens,spec]
 
 end
