@@ -4,10 +4,27 @@ include(pwd()*"/dlmodel.jl")
 
 Random.seed!(1234) # set random numbers
 
+
+w = Any[ xavier(n_hidden_1,n_input), zeros(n_hidden_1,1),
+         xavier(n_hidden_2,n_hidden_1), zeros(n_hidden_2,1),
+         xavier(n_out,n_hidden_2), zeros(n_out,1)]
+
+nbr_training_obs = length(y_train)
+nbr_parameters = 0
+
+
+for i in w
+    global nbr_parameters = nbr_parameters + size(i,1)*size(i,2)
+end
+
+@printf "Nbr training obs %d, nbr parameters %d, obs/parameters %.2f\n" nbr_training_obs nbr_parameters nbr_training_obs/nbr_parameters
+
+optim = optimizers(w, Adam)
+
 # training
-dropout_percentage = 0.1
-lambda = [0.01, 0.01, 0.01]
-@time loss_train, loss_val = train(5000, dropout_percentage, lambda)
+dropout_percentage = 0.0
+lambda = [0.0, 0.0, 0.0]
+@time loss_train_vec, loss_val_vec = train(5000, dropout_percentage, lambda)
 
 # calc predictions
 y_pred_train_proc = predict(w, x_train, 0)
@@ -28,9 +45,10 @@ class_res_training = classification_results(y_pred_train, y_train, [1,2])
 class_res_val = classification_results(y_pred_val, y_val, [1,2])
 class_res_test = classification_results(y_pred_test, y_test, [1,2])
 
+
 # loss as function of epoch
 PyPlot.figure()
-PyPlot.plot(loss_train, "b")
+PyPlot.plot(loss_train_vec, "b")
 
 PyPlot.figure()
-PyPlot.plot(loss_val, "r")
+PyPlot.plot(loss_val_vec, "r")

@@ -15,7 +15,7 @@ include(pwd()*"/utilities.jl")
 Random.seed!(1234) # set random numbers
 
 # load data
-x_train,y_train,x_val,y_val,x_test,y_test = load_data()
+x_train,y_train,x_val,y_val,x_test,y_test = load_data([0,1],0.2)
 
 # create data frame
 training_data = zeros(size(x_train,2), size(x_train,1)+1)

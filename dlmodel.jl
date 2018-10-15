@@ -16,27 +16,14 @@ include(pwd()*"/utilities.jl")
 
 Random.seed!(1234) # set random numbers
 
-x_train,y_train,x_val,y_val,x_test,y_test = load_data([1,2])
+x_train,y_train,x_val,y_val,x_test,y_test = load_data([1,2],0.2)
 
 # define network
 n_input = 8
-n_hidden_1 = 80
+n_hidden_1 = 40
 n_hidden_2 = 20
 n_out = 2
 
-w = Any[ xavier(n_hidden_1,n_input), zeros(n_hidden_1,1),
-         xavier(n_hidden_2,n_hidden_1), zeros(n_hidden_2,1),
-         xavier(n_out,n_hidden_2), zeros(n_out,1)]
-
-nbr_training_obs = length(y_train)
-nbr_parameters = 0
-
-
-for i in w
-    global nbr_parameters = nbr_parameters + size(i,1)*size(i,2)
-end
-
-@printf "Nbr training obs %d, nbr parameters %d, obs/parameters %.2f\n" nbr_training_obs nbr_parameters nbr_training_obs/nbr_parameters
 
 # predict function
 
@@ -55,7 +42,6 @@ loss(w,x,ygold,p, lambda) = Knet.nll(predict(w,x,p), ygold; average=false) + lam
 
 lossgradient = grad(loss)
 
-optim = optimizers(w, Adam)
 
 function train(epoch::Int,dropout_percentage::Real,lambda::Vector)
 
