@@ -30,6 +30,7 @@ model = @formula(x9 ~ x1+x2+x3+x4+x5+x6+x7+x8)
 
 print(logisticregresson)
 
+
 # compute predictions
 y_pred_train = class_logistic(predict(logisticregresson))
 y_pred_test = class_logistic(predict(logisticregresson,test_df))
@@ -37,4 +38,5 @@ y_pred_test = class_logistic(predict(logisticregresson,test_df))
 
 # check classification results
 class_res_training = classification_results(y_pred_train, y_train, [0,1])
+
 class_res_test = classification_results(y_pred_test, y_test, [0,1])
