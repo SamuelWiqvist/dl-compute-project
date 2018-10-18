@@ -15,8 +15,8 @@ function load_data(labels::Vector = [0,1], frac_val::Real = 0.1)
     y_test = convert(Array{Int64,1},d_test[:,end])
 
     # normalize data
-    x_train = x_train ./ std(x_train, dims = 1)
-    x_test = x_test ./ std(x_test, dims = 1)
+    x_train = (x_train .- mean(x_train,dims=1))./std(x_train,dims=1)
+    x_test = (x_test .- mean(x_test,dims=1))./std(x_test,dims=1)
 
     # split training data to training data and val data
     nbr_obs_train = size(x_train,1)

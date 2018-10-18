@@ -39,4 +39,8 @@ y_pred_test = class_logistic(predict(logisticregresson,test_df))
 # check classification results
 class_res_training = classification_results(y_pred_train, y_train, [0,1])
 
+
+
+
+
 class_res_test = classification_results(y_pred_test, y_test, [0,1])

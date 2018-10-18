@@ -78,5 +78,5 @@ test_acc_no_reg = model_fit_regularization[1,1,1,1,4]
 
 @printf "Best dropout percentage %.2f\n" p[1]
 @printf "Best lambda_1 %.10f\n" lambda_1[1]
-@printf "Best lambda_2 %.10f\n" lambda_2[2]
-@printf "Best lambda_3 %.10f\n" lambda_3[6]
+@printf "Best lambda_2 %.10f\n" lambda_2[1]
+@printf "Best lambda_3 %.10f\n" lambda_3[11]

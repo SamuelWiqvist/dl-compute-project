@@ -49,6 +49,10 @@ class_res_test = classification_results(y_pred_test, y_test, [1,2])
 # loss as function of epoch
 PyPlot.figure()
 PyPlot.plot(loss_train_vec, "b")
+PyPlot.ylabel("Loss")
+PyPlot.xlabel("Epoch")
 
 PyPlot.figure()
 PyPlot.plot(loss_val_vec, "r")
+PyPlot.ylabel("Loss")
+PyPlot.xlabel("Epoch")
