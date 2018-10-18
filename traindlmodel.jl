@@ -4,10 +4,9 @@ include(pwd()*"/dlmodel.jl")
 
 Random.seed!(1234) # set random numbers
 
-
 w = Any[ xavier(n_hidden_1,n_input), zeros(n_hidden_1,1),
-         xavier(n_hidden_2,n_hidden_1), zeros(n_hidden_2,1),
-         xavier(n_out,n_hidden_2), zeros(n_out,1)]
+         #xavier(n_hidden_2,n_hidden_1), zeros(n_hidden_2,1),
+         xavier(n_out,n_hidden_1), zeros(n_out,1)]
 
 nbr_training_obs = length(y_train)
 nbr_parameters = 0
@@ -23,8 +22,8 @@ optim = optimizers(w, Adam)
 
 # training
 dropout_percentage = 0.
-lambda = [0.0,0.01, 0.05]
-@time loss_train_vec, loss_val_vec = train(2000, dropout_percentage, lambda, w, optim)
+lambda = [0.0,0.06]
+@time loss_train_vec, loss_val_vec = train(5000, dropout_percentage, lambda, w, optim)
 
 # calc predictions
 y_pred_train_proc = predict(w, x_train, 0)

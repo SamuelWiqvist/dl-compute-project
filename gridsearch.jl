@@ -4,9 +4,10 @@ include(pwd()*"/dlmodel.jl")
 
 p = [0]
 
-lambda_1 = collect(0:0.01:0.1)
-lambda_3 = collect(0:0.01:0.1)
-lambda_2 = collect(0:0.01:0.1)
+lambda_1 = collect(0:0.02:0.5)
+lambda_2 = collect(0:0.02:0.5)
+lambda_3 = [0]
+
 
 model_fit_regularization = zeros(length(p),length(lambda_1),length(lambda_2),length(lambda_3),3+3+1+1)
 model_fit_train = zeros(length(p),length(lambda_1),length(lambda_2),length(lambda_3),2000)
@@ -22,13 +23,13 @@ model_fit_val = zeros(length(p),length(lambda_1),length(lambda_2),length(lambda_
                 Random.seed!(1234) # set random numbers
 
                 w = Any[ xavier(n_hidden_1,n_input), zeros(n_hidden_1,1),
-                         xavier(n_hidden_2,n_hidden_1), zeros(n_hidden_2,1),
-                         xavier(n_out,n_hidden_2), zeros(n_out,1)]
+                         #xavier(n_hidden_2,n_hidden_1), zeros(n_hidden_2,1),
+                         xavier(n_out,n_hidden_1), zeros(n_out,1)]
 
                 optim = optimizers(w, Adam)
 
                 dropout_percentage = p[i]
-                lambda = [lambda_1[j], lambda_2[k], lambda_3[l]]
+                lambda = [lambda_1[j], lambda_2[k]]
                 loss_train_vec, loss_val_vec = train(2000, dropout_percentage, lambda, w, optim)
 
                 model_fit_train[i,j,k,l,:] = loss_train_vec
@@ -78,5 +79,5 @@ test_acc_no_reg = model_fit_regularization[1,1,1,1,4]
 
 @printf "Best dropout percentage %.2f\n" p[1]
 @printf "Best lambda_1 %.10f\n" lambda_1[1]
-@printf "Best lambda_2 %.10f\n" lambda_2[2]
-@printf "Best lambda_3 %.10f\n" lambda_3[6]
+@printf "Best lambda_2 %.10f\n" lambda_2[4]
+@printf "Best lambda_3 %.10f\n" lambda_3[1]
