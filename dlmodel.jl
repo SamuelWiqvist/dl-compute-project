@@ -20,8 +20,8 @@ x_train,y_train,x_val,y_val,x_test,y_test = load_data([1,2],0.2)
 
 # define network
 n_input = 8
-n_hidden_1 = 50
-n_hidden_2 = 20
+n_hidden_1 = 40
+#n_hidden_2 = 20
 n_out = 2
 
 
@@ -38,7 +38,9 @@ function predict(w,x,p)
     return w[end-1]*x .+ w[end]
 end
 
-loss(w,x,ygold,p, lambda) = Knet.nll(predict(w,x,p), ygold; average=true) + lambda[1]*sum(w[1].^2)  + lambda[2]*sum(w[3].^2)  + lambda[3]*sum(w[5].^2)
+#loss(w,x,ygold,p, lambda) = Knet.nll(predict(w,x,p), ygold; average=true) + lambda[1]*sum(w[1].^2)  + lambda[2]*sum(w[3].^2)  + lambda[3]*sum(w[5].^2)
+
+loss(w,x,ygold,p, lambda) = Knet.nll(predict(w,x,p), ygold; average=true) + lambda[1]*sum(w[1].^2)  + lambda[2]*sum(w[3].^2)
 
 lossgradient = grad(loss)
 
