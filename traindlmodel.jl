@@ -23,7 +23,7 @@ optim = optimizers(w, Adam)
 
 # training
 dropout_percentage = 0.
-lambda = [0.0,0.01, 0.05]
+lambda = [0.1,0.1, 0.1]
 @time loss_train_vec, loss_val_vec = train(2000, dropout_percentage, lambda, w, optim)
 
 # calc predictions

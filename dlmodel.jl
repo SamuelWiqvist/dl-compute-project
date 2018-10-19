@@ -35,7 +35,7 @@ function predict(w,x,p)
         end
         x = relu.(w[i]*x .+ w[i+1])
     end
-    return w[end-1]*x .+ w[end]
+    return softmax(w[end-1]*x .+ w[end];dims=1)
 end
 
 loss(w,x,ygold,p, lambda) = Knet.nll(predict(w,x,p), ygold; average=true) + lambda[1]*sum(w[1].^2)  + lambda[2]*sum(w[3].^2)  + lambda[3]*sum(w[5].^2)
